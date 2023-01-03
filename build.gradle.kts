@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.6.20-M1"
+    kotlin("multiplatform") version "1.8.0"
     id("convention.publication")
 }
 
@@ -23,7 +23,9 @@ kotlin {
     js(BOTH) {
         browser {
             commonWebpackConfig {
-                cssSupport.enabled = true
+                cssSupport {
+                    enabled.set(true)
+                }
             }
         }
     }
@@ -35,7 +37,6 @@ kotlin {
         isMingwX64 -> mingwX64("native")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
-
 
     sourceSets {
         val commonMain by getting
