@@ -5,7 +5,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @Suppress("UNUSED_VALUE")
-class AndroidWearReferenceTest {
+class AndroidWeakReferenceTest {
 
     @Test
     fun testGetGC() {
