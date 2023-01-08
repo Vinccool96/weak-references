@@ -1,10 +1,15 @@
+import org.jetbrains.kotlin.gradle.targets.js.npm.NpmResolverPlugin
+import java.util.*
+
 plugins {
     kotlin("multiplatform") version "1.8.0"
     id("com.android.library")
+    id("maven-publish")
 }
+plugins.apply(NpmResolverPlugin::class.java)
 
 group = "io.github.vinccool96.ref"
-version = "1.0"
+version = "1.0.1"
 
 repositories {
     google()
@@ -28,6 +33,7 @@ kotlin {
                 }
             }
         }
+        nodejs()
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
@@ -48,7 +54,13 @@ kotlin {
         }
         val jvmMain by getting
         val jvmTest by getting
-        val jsMain by getting
+        val jsMain by getting {
+            dependencies {
+                implementation(npm("node-weak-ref", "2.0.1"))
+                implementation(npm("expose-ts-gc", "1.0.0"))
+            }
+            project.tasks["kotlinStoreYarnLock"].dependsOn("buildNodeWeakRef")
+        }
         val jsTest by getting
         val nativeMain by getting
         val nativeTest by getting
@@ -75,5 +87,18 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+}
+
+tasks.register("buildNodeWeakRef") {
+    doFirst {
+        exec {
+            workingDir = File("$projectDir/build/js/node_modules/node-weak-ref")
+            if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) {
+                commandLine("cmd", "/c", "node-gyp", "rebuild")
+            } else {
+                commandLine("bash", "-c", "node-gyp", "rebuild")
+            }
+        }
     }
 }
